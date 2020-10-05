@@ -3,7 +3,6 @@ const { exec, execSync } = require('child_process')
 const util = require('util')
 const execPromise = util.promisify(exec)
 const ObjectsToCsv = require('objects-to-csv')
-const open = require('open')
 
 // Utilities
 const org = process.argv[2] !== undefined ? process.argv[2] : process.env['ORG']
