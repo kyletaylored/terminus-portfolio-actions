@@ -94,10 +94,10 @@ Promise.all(sitePromises).then((sites) => {
       // Wait for domains for finish processing
       Promise.all(domainPromises).then(async (domains) => {
         const csv = new ObjectsToCsv(domains)
+        const fileName = `/tmp/${org} Site Inventory.csv`
 
         // Save to file:
-        let fileName = `/tmp/${org} Site Inventory.csv`
-        await csv.toDisk(fileName).then((r) => {
+        await csv.toDisk(fileName).finally((r) => {
           console.log(`Domain file: ${fileName}`)
         })
 
