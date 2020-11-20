@@ -154,10 +154,13 @@ exports.mergeLogs = async function (id, ips) {
       exec(`rm -rf logs/${id}/${ip}`)
     }
   }
-
-  return status
 }
 
+/**
+ *
+ * @param {object} site The Site object
+ * @param {string} env Target environment
+ */
 exports.processLogs = async function (site, env) {
   let ips = await exports.getContainerIps(site.id, env)
 
@@ -169,4 +172,5 @@ exports.processLogs = async function (site, env) {
 
   // Merge log files
   await exports.mergeLogs(site.id, ips)
+  return site
 }
