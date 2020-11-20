@@ -1,20 +1,18 @@
 #!/usr/local/bin/node
+const fs = require('fs')
 const { execSync } = require('child_process')
-const ObjectsToCsv = require('objects-to-csv')
-const { getSites, getDomains } = require('./utils.js')
+const { getSites, processLogs } = require('./utils.js')
 
 // Utilities
 const org = process.argv[2] !== undefined ? process.argv[2] : process.env['ORG']
 console.log({ org })
+const env = 'live'
 
 // Get upstreams.
 const upstreamFields = 'ID,Machine Name'
 const customUpstream = JSON.parse(execSync(`terminus org:upstream:list "${org}" --format json --fields "${upstreamFields}"`))
 const coreUpstream = JSON.parse(execSync(`terminus upstream:list --filter type=core --format json --fields "${upstreamFields}"`))
 const upstreams = Object.assign({}, customUpstream, coreUpstream)
-
-// Get owners
-let owners = JSON.parse(execSync(`terminus org:people:list "${org}" --format json`))
 
 // Assign promises for sites
 let sitePromises = []
@@ -26,28 +24,21 @@ for (upstream in upstreams) {
 
 // Start looping through sites.
 Promise.all(sitePromises).then((sites) => {
-  domainPromises = []
+  logPromises = []
   for (upstream in sites) {
     let up = sites[upstream]
-    // Get domains
+    // Loop through each individual site
     if (up !== undefined || up.length > 0) {
       for (s in up) {
         let site = up[s]
-        domainPromises.push(getDomains(site))
+        if (site.plan_name !== 'Sandbox' && site.frozen === false) {
+          logPromises.push(processLogs(site, env))
+        }
       }
     }
   }
-  // Wait for domains for finish processing
-  Promise.all(domainPromises).then(async (domains) => {
-    const csv = new ObjectsToCsv(domains)
-    const fileName = `/tmp/${org} Site Inventory.csv`
-
-    // Save to file:
-    await csv.toDisk(fileName).then((r) => {
-      console.log(`Domain file: ${fileName}`)
-    })
-
-    // Return the CSV file as string:
-    // console.log(await csv.toString())
+  // Process all logs.
+  Promise.all(logPromises).then(async (logs) => {
+    console.log(logs)
   })
 })
