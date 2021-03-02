@@ -86,7 +86,7 @@ exports.getContainerIps = async (id, env) => {
 exports.getAppLogs = async function (ip, id, env) {
   // Create directory, then rsync files
   execSync(`mkdir -p logs/${id}/${ip}`)
-  execSync(`rsync -zabuP -e 'ssh -p 2222' ${env}.${id}@appserver.${env}.${id}.drush.in:logs/* logs/${id}/${ip}`)
+  execSync(`rsync -zabuP -e 'ssh -p 2222 -oStrictHostKeyChecking=no' ${env}.${id}@appserver.${env}.${id}.drush.in:logs/* logs/${id}/${ip}`)
 }
 
 /**
@@ -98,7 +98,7 @@ exports.getAppLogs = async function (ip, id, env) {
 exports.getDbLogs = async function (ip, id, env) {
   // Create directory, then rsync files
   execSync(`mkdir -p logs/${id}/${ip}`)
-  execSync(`rsync -zabuP -e 'ssh -p 2222' ${env}.${id}@dbserver.${env}.${id}.drush.in:logs/* logs/${id}/${ip}`)
+  execSync(`rsync -zabuP -e 'ssh -p 2222 -oStrictHostKeyChecking=no' ${env}.${id}@dbserver.${env}.${id}.drush.in:logs/* logs/${id}/${ip}`)
 }
 
 /**

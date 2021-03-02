@@ -2,6 +2,7 @@
 const fs = require('fs')
 const { execSync } = require('child_process')
 const { getSites, processLogs } = require('./utils.js')
+const { promisify } = require('util')
 
 // Utilities
 const org = process.argv[2] !== undefined ? process.argv[2] : process.env['ORG']
